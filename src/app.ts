@@ -5,11 +5,13 @@ import express, { Express } from "express";
 import mongoose from "mongoose";
 import postRoutes from "./routes/postRoutes";
 import commentRoutes from "./routes/commentRoutes";
+import authRoutes from "./routes/authRoutes";
 
 const app = express();
 
 app.use(express.json());
 
+app.use("/auth", authRoutes);
 app.use("/post", postRoutes);
 app.use("/comment", commentRoutes);
 
