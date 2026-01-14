@@ -1,0 +1,390 @@
+openapi: 3.0.0
+info:
+  title: Web Assignment 2 API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+
+tags:
+  - name: Auth
+    description: Authentication
+  - name: Posts
+    description: Post management
+  - name: Comments
+    description: Comment management
+  - name: Users
+    description: User management
+
+paths:
+  # -------------------- AUTH --------------------
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+      responses:
+        "200":
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid input
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  example: user@example.com
+                password:
+                  type: string
+                  example: "123456"
+      responses:
+        "200":
+          description: Access & refresh tokens
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tokens"
+        "401":
+          description: Invalid credentials
+
+  /auth/logout:
+    get:
+      tags: [Auth]
+      summary: Logout a user
+      description: Provide refresh token in Authorization header as Bearer token
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Logout completed
+        "401":
+          description: Unauthorized / invalid token
+
+  /auth/refresh:
+    get:
+      tags: [Auth]
+      summary: Refresh tokens using refresh token
+      description: Provide refresh token in Authorization header as Bearer token
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: New access & refresh tokens
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tokens"
+        "401":
+          description: Unauthorized / invalid refresh token
+
+  # -------------------- POSTS --------------------
+  /post:
+    get:
+      tags: [Posts]
+      summary: Get all posts
+      responses:
+        "200":
+          description: List of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+    post:
+      tags: [Posts]
+      summary: Create a new post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostCreate"
+      responses:
+        "201":
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "400":
+          description: Invalid input
+
+  /post/{id}:
+    get:
+      tags: [Posts]
+      summary: Get post by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Post id (ObjectId)
+      responses:
+        "200":
+          description: Post found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "404":
+          description: Post not found
+    put:
+      tags: [Posts]
+      summary: Update a post by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Post id (ObjectId)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostUpdate"
+      responses:
+        "200":
+          description: Post updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "404":
+          description: Post not found
+
+  # -------------------- COMMENTS --------------------
+  /comment:
+    get:
+      tags: [Comments]
+      summary: Get all comments
+      responses:
+        "200":
+          description: List of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+    post:
+      tags: [Comments]
+      summary: Create a new comment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentCreate"
+      responses:
+        "201":
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "400":
+          description: Invalid input
+
+  /comment/{id}:
+    get:
+      tags: [Comments]
+      summary: Get comment by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Comment id (ObjectId)
+      responses:
+        "200":
+          description: Comment found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "404":
+          description: Comment not found
+    put:
+      tags: [Comments]
+      summary: Update a comment by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Comment id (ObjectId)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentUpdate"
+      responses:
+        "200":
+          description: Comment updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "404":
+          description: Comment not found
+    delete:
+      tags: [Comments]
+      summary: Delete a comment by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Comment id (ObjectId)
+      responses:
+        "200":
+          description: Comment deleted
+        "404":
+          description: Comment not found
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # ---------- Common ----------
+    ObjectId:
+      type: string
+      description: MongoDB ObjectId
+      example: "65a1f0f3a9c2b2a1c1234567"
+
+    # ---------- Users ----------
+    User:
+      type: object
+      properties:
+        _id:
+          $ref: "#/components/schemas/ObjectId"
+        email:
+          type: string
+          example: "user@example.com"
+        imgUrl:
+          type: string
+          nullable: true
+          example: "https://example.com/avatar.png"
+      required: [email]
+
+    UserCreate:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          example: "user@example.com"
+        password:
+          type: string
+          example: "P@ssw0rd!"
+        imgUrl:
+          type: string
+          example: "https://example.com/avatar.png"
+
+    # ---------- Auth ----------
+    Tokens:
+      type: object
+      required: [accessToken, refreshToken]
+      properties:
+        accessToken:
+          type: string
+          description: JWT access token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI...
+        refreshToken:
+          type: string
+          description: JWT refresh token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI...
+
+    # ---------- Posts ----------
+    Post:
+      type: object
+      properties:
+        _id:
+          $ref: "#/components/schemas/ObjectId"
+        message:
+          type: string
+          example: "Hello from my first post!"
+        sender:
+          $ref: "#/components/schemas/ObjectId"
+      required: [message, sender]
+
+    PostCreate:
+      type: object
+      required: [message, sender]
+      properties:
+        message:
+          type: string
+          example: "Hello from my first post!"
+        sender:
+          $ref: "#/components/schemas/ObjectId"
+
+    PostUpdate:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Updated post message"
+
+    # ---------- Comments ----------
+    Comment:
+      type: object
+      properties:
+        _id:
+          $ref: "#/components/schemas/ObjectId"
+        post:
+          $ref: "#/components/schemas/ObjectId"
+        sender:
+          $ref: "#/components/schemas/ObjectId"
+        message:
+          type: string
+          example: "Nice post!"
+      required: [post, sender, message]
+
+    CommentCreate:
+      type: object
+      required: [post, sender, message]
+      properties:
+        post:
+          $ref: "#/components/schemas/ObjectId"
+        sender:
+          $ref: "#/components/schemas/ObjectId"
+        message:
+          type: string
+          example: "Nice post!"
+
+    CommentUpdate:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Edited comment text"
