@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IPost extends Document {
     message: string;
-    sender: string;
+    sender: mongoose.Types.ObjectId;
 }
 
 const postSchema: Schema = new Schema({
@@ -11,7 +11,8 @@ const postSchema: Schema = new Schema({
         required: true,
     },
     sender: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "User",
         required: true,
     },
 });
