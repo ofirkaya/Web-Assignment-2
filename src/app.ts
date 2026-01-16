@@ -6,11 +6,20 @@ import mongoose from "mongoose";
 import postRoutes from "./routes/postRoutes";
 import commentRoutes from "./routes/commentRoutes";
 import authRoutes from "./routes/authRoutes";
+import swaggerUi from "swagger-ui-express";
+import fs from "fs";
+import path from "path";
+import YAML from "yaml";
 
 const app = express();
 
 app.use(express.json());
 
+const swaggerPath = path.resolve(process.cwd(), "./src/swagger/swagger.yaml");
+const swaggerFile = fs.readFileSync(swaggerPath, "utf8");
+const swaggerDocument = YAML.parse(swaggerFile);
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/auth", authRoutes);
 app.use("/post", postRoutes);
 app.use("/comment", commentRoutes);
