@@ -15,7 +15,7 @@ afterAll(async () => {
 
 describe("Smoke Test", () => {
   it("GET /api-docs should return 200", async () => {
-    const res = await request(app).get("/api-docs");
+    const res = await request(app).get("/api-docs/");
     expect(res.status).toBe(200);
   });
 });

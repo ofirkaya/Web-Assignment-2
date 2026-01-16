@@ -5,4 +5,9 @@ module.exports = {
   testMatch: ["**/__tests__/**/*.test.ts"],
   collectCoverage: true,
   collectCoverageFrom: ["src/**/*.ts", "!src/server.ts"],
+  globals: {
+    'ts-jest': {
+      diagnostics: false
+    }
+  }
 };
