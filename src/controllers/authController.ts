@@ -37,8 +37,9 @@ const register = async (req: Request, res: Response) => {
 }
 
 const generateTokens = async (user: any) => {
-    const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION });
-    const refreshToken = jwt.sign({ _id: user._id }, process.env.JWT_REFRESH_SECRET);
+    const expiresIn = process.env.JWT_EXPIRATION || '1h';
+    const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET as string, { expiresIn } as jwt.SignOptions);
+    const refreshToken = jwt.sign({ _id: user._id, nonce: Math.random().toString(36) }, process.env.JWT_REFRESH_SECRET as string);
     if (user.refreshTokens == null) {
         user.refreshTokens = [refreshToken];
     } else {
@@ -78,7 +79,7 @@ const logout = async (req: Request, res: Response) => {
     const authHeader = req.headers['authorization'];
     const refreshToken = authHeader && authHeader.split(' ')[1];
     if (refreshToken == null) return res.sendStatus(401);
-    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, async (err, user: { '_id': string }) => {
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string, async (err, user: { '_id': string }) => {
         if (err) return res.sendStatus(401);
         try {
             const userDb = await User.findOne({ '_id': user._id });
@@ -104,7 +105,7 @@ const refresh = async (req: Request, res: Response) => {
     const authHeader = req.headers['authorization'];
     const refreshToken = authHeader && authHeader.split(' ')[1];
     if (refreshToken == null) return res.sendStatus(401);
-    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, async (err, user: { '_id': string }) => {
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string, async (err, user: { '_id': string }) => {
         if (err) return res.sendStatus(401);
         try {
             const userDb = await User.findOne({ '_id': user._id });
@@ -116,8 +117,9 @@ const refresh = async (req: Request, res: Response) => {
                 await userDb.save();
                 return res.sendStatus(401);
             }
-            const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION });
-            const newRefreshToken = jwt.sign({ _id: user._id }, process.env.JWT_REFRESH_SECRET);
+            const expiresIn = process.env.JWT_EXPIRATION || '1h';
+            const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET as string, { expiresIn } as jwt.SignOptions);
+            const newRefreshToken = jwt.sign({ _id: user._id, nonce: Math.random().toString(36) }, process.env.JWT_REFRESH_SECRET as string);
             userDb.refreshTokens = userDb.refreshTokens.filter(t => t !== refreshToken);
             userDb.refreshTokens.push(newRefreshToken);
             await userDb.save();

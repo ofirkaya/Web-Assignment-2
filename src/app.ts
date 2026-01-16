@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import postRoutes from "./routes/postRoutes";
 import commentRoutes from "./routes/commentRoutes";
 import authRoutes from "./routes/authRoutes";
+import userRoutes from "./routes/userRoutes";
 import swaggerUi from "swagger-ui-express";
 import fs from "fs";
 import path from "path";
@@ -21,6 +22,7 @@ const swaggerDocument = YAML.parse(swaggerFile);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/auth", authRoutes);
+app.use("/user", userRoutes);
 app.use("/post", postRoutes);
 app.use("/comment", commentRoutes);
 

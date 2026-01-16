@@ -60,4 +60,23 @@ describe("Posts API", () => {
     expect(res.status).toBe(500);
     expect(res.body).toHaveProperty("error");
   });
+
+  it("DELETE /post/:id -> 200 deletes post", async () => {
+    const user = await User.create({ email: "del@a.com", password: "123456" });
+    const post = await request(app).post("/post").send({
+      message: "to delete",
+      sender: user._id.toString(),
+    });
+
+    const res = await request(app).delete(`/post/${post.body._id}`);
+    expect(res.status).toBe(200);
+
+    const check = await request(app).get(`/post/${post.body._id}`);
+    expect(check.status).toBe(404);
+  });
+
+  it("DELETE /post/:id -> 404 when not found", async () => {
+    const res = await request(app).delete("/post/65a1f0f3a9c2b2a1c1234567");
+    expect(res.status).toBe(404);
+  });
 });

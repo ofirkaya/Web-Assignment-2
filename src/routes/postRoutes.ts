@@ -155,4 +155,25 @@ router.post("/", postController.post.bind(postController));
  */
 router.put("/:id", postController.put.bind(postController));
 
+/**
+ * @swagger
+ * /post/{id}:
+ *   delete:
+ *     summary: Delete a post by id
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Post id (ObjectId)
+ *     responses:
+ *       200:
+ *         description: Post deleted
+ *       404:
+ *         description: Post not found
+ */
+router.delete("/:id", postController.delete.bind(postController));
+
 export default router;
