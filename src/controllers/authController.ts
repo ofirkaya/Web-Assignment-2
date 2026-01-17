@@ -3,9 +3,7 @@ import User, { IUser } from '../models/userModel';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-
 const register = async (req: Request, res: Response) => {
-    console.log(req.body)
     const email = req.body.email;
     const password = req.body.password;
     const imgUrl = req.body.imgUrl;
@@ -34,7 +32,6 @@ const register = async (req: Request, res: Response) => {
                 ...tokens
             })
     } catch (err) {
-        console.log(err)
         return res.status(500).json({ message: "Internal server error" });
     }
 }
