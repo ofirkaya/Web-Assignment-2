@@ -3,7 +3,9 @@ import User, { IUser } from '../models/userModel';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
+
 const register = async (req: Request, res: Response) => {
+    console.log(req.body)
     const email = req.body.email;
     const password = req.body.password;
     const imgUrl = req.body.imgUrl;
@@ -32,7 +34,8 @@ const register = async (req: Request, res: Response) => {
                 ...tokens
             })
     } catch (err) {
-        return res.status(400).send("error missing email or password");
+        console.log(err)
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -71,7 +74,7 @@ const login = async (req: Request, res: Response) => {
         const tokens = await generateTokens(user)
         return res.status(200).send(tokens);
     } catch (err) {
-        return res.status(400).send("error missing email or password");
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 
