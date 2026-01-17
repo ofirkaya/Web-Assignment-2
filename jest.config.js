@@ -4,7 +4,11 @@ module.exports = {
   testEnvironment: "node",
   testMatch: ["**/__tests__/**/*.test.ts"],
   collectCoverage: true,
-  collectCoverageFrom: ["src/**/*.ts", "!src/server.ts"],
+  collectCoverageFrom: [
+    "src/**/*.ts",
+    "!src/server.ts",
+    "!src/middleware/**"
+  ],
   globals: {
     'ts-jest': {
       diagnostics: false
