@@ -32,7 +32,7 @@ const register = async (req: Request, res: Response) => {
                 ...tokens
             })
     } catch (err) {
-        return res.status(400).send("error missing email or password");
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -71,7 +71,7 @@ const login = async (req: Request, res: Response) => {
         const tokens = await generateTokens(user)
         return res.status(200).send(tokens);
     } catch (err) {
-        return res.status(400).send("error missing email or password");
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 
